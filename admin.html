@@ -7,6 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <!-- jsPDF para generación de PDF en el cliente -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- QRCode.js para generar QR en PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root{--mint:#3DFFC0;--mint-glow:#00FFB0;--mint-soft:#a8fff0;--mint-dim:rgba(61,255,192,0.12);--dark:#050f0c;--dark2:#071a14;--text:#e8fdf7;--text-dim:#7ab8a4;--red:#ff6b6b;--red-dim:rgba(255,107,107,0.12);--yellow:#ffd166;--yellow-dim:rgba(255,209,102,0.12);}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -245,7 +247,7 @@
 // ========= CONFIG =========
 const BASE_URL    = 'https://15deabril.vercel.app/index.html';
 const WA_NUMBER   = '541126753961';
-const STORAGE_KEY = 'abril15_v4_guests';
+const STORAGE_KEY = 'abril15_v5_guests';
 
 // ========= TOKEN =========
 async function generateToken(id, nombre) {
@@ -272,11 +274,50 @@ function load() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { guests = JSON.parse(raw); return; }
   guests = [
-    {id:'001',nombre:'Valentina López',grupo:'Amigos del cole',confirmado:null,notas:''},
-    {id:'002',nombre:'Luciana Martínez',grupo:'Amigos del cole',confirmado:null,notas:''},
-    {id:'003',nombre:'Familia García',grupo:'Familia',confirmado:true,notas:'Mesa 1'},
-    {id:'004',nombre:'Sofía Rodríguez',grupo:'Danza',confirmado:false,notas:''},
-    {id:'005',nombre:'Camila Torres',grupo:'Vecinos',confirmado:null,notas:''},
+    {id:'01',nombre:'Abuela Elsa',grupo:'familia',confirmado:null,notas:''},
+    {id:'02',nombre:'Abuelo Dani',grupo:'familia',confirmado:null,notas:''},
+    {id:'03',nombre:'Nazarena',grupo:'familia',confirmado:null,notas:''},
+    {id:'04',nombre:'Matias',grupo:'familia',confirmado:null,notas:''},
+    {id:'05',nombre:'Tia Ivana',grupo:'familia',confirmado:null,notas:''},
+    {id:'06',nombre:'Tio Alejandro',grupo:'familia',confirmado:null,notas:''},
+    {id:'07',nombre:'Leandro',grupo:'familia',confirmado:null,notas:''},
+    {id:'08',nombre:'Rata',grupo:'familia',confirmado:null,notas:''},
+    {id:'09',nombre:'Tia Melody y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'10',nombre:'Lucas y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'11',nombre:'Abuela Celestina',grupo:'familia',confirmado:null,notas:''},
+    {id:'12',nombre:'Abuelo Jose',grupo:'familia',confirmado:null,notas:''},
+    {id:'13',nombre:'Ita',grupo:'familia',confirmado:null,notas:''},
+    {id:'14',nombre:'Zoe',grupo:'familia',confirmado:null,notas:''},
+    {id:'15',nombre:'Tia Rosa y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'16',nombre:'Tia Pacho y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'17',nombre:'Tia Evelia',grupo:'familia',confirmado:null,notas:''},
+    {id:'18',nombre:'Tomas y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'19',nombre:'Florencia y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'20',nombre:'Gabriela y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'21',nombre:'Tio Sebastián y Flia',grupo:'familia',confirmado:null,notas:''},
+    {id:'22',nombre:'Nicolas',grupo:'amigos',confirmado:null,notas:''},
+    {id:'23',nombre:'Simona',grupo:'amigos',confirmado:null,notas:''},
+    {id:'24',nombre:'Fiorella',grupo:'amigos',confirmado:null,notas:''},
+    {id:'25',nombre:'Estigarribia',grupo:'amigos',confirmado:null,notas:''},
+    {id:'26',nombre:'Milagros Arias',grupo:'amigos',confirmado:null,notas:''},
+    {id:'27',nombre:'Martina Ruiz',grupo:'amigos',confirmado:null,notas:''},
+    {id:'28',nombre:'Malena',grupo:'amigos',confirmado:null,notas:''},
+    {id:'29',nombre:'Valentina',grupo:'amigos',confirmado:null,notas:''},
+    {id:'30',nombre:'Kiara',grupo:'amigos',confirmado:null,notas:''},
+    {id:'31',nombre:'Barbara',grupo:'amigos',confirmado:null,notas:''},
+    {id:'32',nombre:'Cinthia y Flia',grupo:'amigos',confirmado:null,notas:''},
+    {id:'33',nombre:'Martina Obregón',grupo:'amigos',confirmado:null,notas:''},
+    {id:'34',nombre:'Brian Aldana',grupo:'amigos',confirmado:null,notas:''},
+    {id:'35',nombre:'Marcos',grupo:'amigos',confirmado:null,notas:''},
+    {id:'36',nombre:'Santiago',grupo:'amigos',confirmado:null,notas:''},
+    {id:'37',nombre:'Priscilla',grupo:'amigos',confirmado:null,notas:''},
+    {id:'38',nombre:'Avril y Flia',grupo:'amigos',confirmado:null,notas:''},
+    {id:'39',nombre:'Fiorella Melody',grupo:'amigos',confirmado:null,notas:''},
+    {id:'40',nombre:'Milagros',grupo:'amigos',confirmado:null,notas:''},
+    {id:'41',nombre:'Laura Bordon y Flia',grupo:'amigos',confirmado:null,notas:''},
+    {id:'42',nombre:'Alejandra Liendro y Flia',grupo:'amigos',confirmado:null,notas:''},
+    {id:'43',nombre:'Ramiro Landete',grupo:'amigos',confirmado:null,notas:''},
+    {id:'44',nombre:'Ramiro Perez',grupo:'amigos',confirmado:null,notas:''},
   ];
   save();
 }
@@ -394,134 +435,251 @@ function toggleQR() {
 }
 
 // ========= GENERADOR DE PDF =========
+async function generateQRDataURL(text) {
+  return new Promise((resolve, reject) => {
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:200px;height:200px;';
+    document.body.appendChild(container);
+    try {
+      new QRCode(container, {
+        text: text,
+        width: 200,
+        height: 200,
+        colorDark: '#050f0c',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) { document.body.removeChild(container); reject(e); return; }
+    setTimeout(() => {
+      const canvas = container.querySelector('canvas');
+      const dataUrl = canvas ? canvas.toDataURL('image/png') : null;
+      document.body.removeChild(container);
+      dataUrl ? resolve(dataUrl) : reject(new Error('QR canvas not found'));
+    }, 150);
+  });
+}
+
 async function buildPDF(g, url) {
   const { jsPDF } = window.jspdf;
 
-  // Tamaño tarjeta de invitación: 148x210mm (A5 apaisado horizontal)
+  // Tarjeta A5 horizontal: 148x105mm
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148, 105] });
   const W = 148, H = 105;
 
-  // ── Fondo oscuro ──
+  // ── Fondo negro verdoso ──
   doc.setFillColor(5, 15, 12);
   doc.rect(0, 0, W, H, 'F');
 
-  // ── Degradado simulado (círculo mint arriba izquierda) ──
-  const drawCircleGlow = (cx, cy, r, alpha) => {
-    for (let i = r; i > 0; i -= 2) {
-      const a = (alpha * (r - i) / r);
+  // ── Glows laterales ──
+  const glow = (cx, cy, maxR, steps) => {
+    for (let i = steps; i > 0; i--) {
+      const r = maxR * (i / steps);
+      const alpha = 0.04 * (i / steps);
       doc.setFillColor(61, 255, 192);
-      doc.setGState(doc.GState({ opacity: a * 0.08 }));
-      doc.circle(cx, cy, i, 'F');
+      doc.setGState(doc.GState({ opacity: alpha }));
+      doc.circle(cx, cy, r, 'F');
     }
     doc.setGState(doc.GState({ opacity: 1 }));
   };
-  drawCircleGlow(-10, -10, 60, 1);
-  drawCircleGlow(W + 10, H + 10, 50, 0.8);
+  glow(0, 0, 55, 18);
+  glow(W, H, 45, 15);
+  glow(W * 0.35, H * 0.5, 30, 10);
 
-  // ── Borde exterior ──
+  // ── Divisor vertical (separa info de QR) ──
+  const divX = 96;
   doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.4);
-  doc.setGState(doc.GState({ opacity: 0.25 }));
-  doc.rect(4, 4, W - 8, H - 8);
+  doc.setLineWidth(0.18);
+  doc.setGState(doc.GState({ opacity: 0.2 }));
+  doc.line(divX, 8, divX, H - 8);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  // ── Línea decorativa superior ──
+  // ══════════════════════════════
+  // COLUMNA IZQUIERDA (info evento)
+  // ══════════════════════════════
+  const LX = divX / 2; // centro columna izquierda
+
+  // Borde exterior fino
   doc.setDrawColor(61, 255, 192);
+  doc.setLineWidth(0.5);
+  doc.setGState(doc.GState({ opacity: 0.18 }));
+  doc.rect(3, 3, W - 6, H - 6);
+  doc.setGState(doc.GState({ opacity: 1 }));
+
+  // Línea decorativa superior
   doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.4 }));
-  doc.line(20, 12, W - 20, 12);
+  doc.setGState(doc.GState({ opacity: 0.5 }));
+  doc.line(8, 9, divX - 4, 9);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  // ── CORONA emoji simulado con texto ──
-  doc.setFontSize(18);
+  // Estrella decorativa
+  doc.setFontSize(10);
   doc.setTextColor(61, 255, 192);
-  doc.text('✦', W / 2, 20, { align: 'center' });
+  doc.text('✦', LX, 17, { align: 'center' });
 
-  // ── "Te invita a celebrar sus" ──
-  doc.setFontSize(7);
-  doc.setTextColor(122, 184, 164);
+  // "te invita a celebrar sus"
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
-  doc.text('TE INVITA A CELEBRAR SUS', W / 2, 27, { align: 'center', charSpace: 1.5 });
+  doc.setTextColor(122, 184, 164);
+  doc.text('TE INVITA A CELEBRAR SUS', LX, 23, { align: 'center', charSpace: 1.2 });
 
-  // ── QUINCE AÑOS ──
-  doc.setFontSize(9);
+  // "quince años"
+  doc.setFontSize(8.5);
   doc.setTextColor(61, 255, 192);
-  doc.text('✦  QUINCE  AÑOS  ✦', W / 2, 33, { align: 'center', charSpace: 1 });
+  doc.text('* QUINCE ANOS *', LX, 29, { align: 'center', charSpace: 0.8 });
 
-  // ── NOMBRE grande ──
-  doc.setFontSize(36);
+  // Nombre grande "ABRIL"
+  doc.setFontSize(34);
+  doc.setFont('helvetica', 'bolditalic');
   doc.setTextColor(232, 253, 247);
-  doc.setFont('helvetica', 'italic');
-  doc.text('ABRIL', W / 2, 48, { align: 'center' });
+  doc.text('ABRIL', LX, 46, { align: 'center' });
 
-  // ── Divider ──
+  // Divider central
   doc.setDrawColor(61, 255, 192);
   doc.setLineWidth(0.3);
-  doc.setGState(doc.GState({ opacity: 0.5 }));
-  doc.line(W / 2 - 20, 52, W / 2 + 20, 52);
+  doc.setGState(doc.GState({ opacity: 0.6 }));
+  doc.line(LX - 16, 50, LX + 16, 50);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  // ── FECHA ──
-  doc.setFontSize(9);
+  // Fecha
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(168, 255, 240);
+  doc.text('VIERNES 17 DE ABRIL · 2026', LX, 57, { align: 'center', charSpace: 0.5 });
+
+  // Hora
+  doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(122, 184, 164);
-  doc.text('VIERNES  17  DE  ABRIL  2026  ·  21:00 HS', W / 2, 58, { align: 'center', charSpace: 0.8 });
+  doc.text('21:00 HS  hasta las 5:00 AM', LX, 63, { align: 'center' });
 
-  // ── LUGAR ──
+  // Lugar
   doc.setFontSize(8);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(168, 255, 240);
-  doc.text('Merlo · Buenos Aires', W / 2, 64, { align: 'center' });
+  doc.text('Merlo, Buenos Aires', LX, 70, { align: 'center' });
 
-  // ── Dress code ──
-  doc.setFontSize(7);
+  // Dress code
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(122, 184, 164);
-  doc.text('DRESS CODE: ELEGANTE SPORT  ·  Sin Verde', W / 2, 70, { align: 'center', charSpace: 0.5 });
+  doc.text('DRESS CODE: ELEGANTE SPORT', LX, 77, { align: 'center', charSpace: 0.5 });
 
-  // ── Caja para el invitado ──
-  doc.setFillColor(61, 255, 192);
-  doc.setGState(doc.GState({ opacity: 0.07 }));
-  doc.roundedRect(14, 74, W - 28, 16, 2, 2, 'F');
+  // Sin verde (caja roja)
+  doc.setFillColor(180, 40, 40);
+  doc.setGState(doc.GState({ opacity: 0.15 }));
+  doc.roundedRect(LX - 24, 80, 48, 7, 1, 1, 'F');
   doc.setGState(doc.GState({ opacity: 1 }));
+  doc.setDrawColor(200, 60, 60);
+  doc.setLineWidth(0.2);
+  doc.setGState(doc.GState({ opacity: 0.4 }));
+  doc.roundedRect(LX - 24, 80, 48, 7, 1, 1, 'S');
+  doc.setGState(doc.GState({ opacity: 1 }));
+  doc.setFontSize(6);
+  doc.setTextColor(255, 140, 140);
+  doc.text('Sin color verde, por favor', LX, 84.8, { align: 'center' });
+
+  // Línea decorativa inferior (col izq)
   doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.25);
-  doc.setGState(doc.GState({ opacity: 0.3 }));
-  doc.roundedRect(14, 74, W - 28, 16, 2, 2, 'S');
+  doc.setLineWidth(0.2);
+  doc.setGState(doc.GState({ opacity: 0.5 }));
+  doc.line(8, H - 9, divX - 4, H - 9);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  doc.setFontSize(6.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(122, 184, 164);
-  doc.text('INVITACIÓN PERSONAL PARA', W / 2, 79.5, { align: 'center', charSpace: 1 });
-
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(61, 255, 192);
-  doc.text(g.nombre, W / 2, 86, { align: 'center' });
-
-  // ── Link único ──
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 160, 140);
+  doc.text('con amor  *  Abril · 2026', LX, H - 5, { align: 'center', charSpace: 0.3 });
+
+  // ══════════════════════════════
+  // COLUMNA DERECHA (invitado + QR)
+  // ══════════════════════════════
+  const RX = divX + (W - divX) / 2; // centro columna derecha ~122mm
+  const RW = W - divX; // ~52mm
+
+  // Línea decorativa superior (col der)
+  doc.setDrawColor(61, 255, 192);
+  doc.setLineWidth(0.2);
+  doc.setGState(doc.GState({ opacity: 0.5 }));
+  doc.line(divX + 4, 9, W - 8, 9);
+  doc.setGState(doc.GState({ opacity: 1 }));
+
+  // "invitación personal para"
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'normal');
   doc.setTextColor(122, 184, 164);
-  doc.text('Tu link personalizado:', W / 2, 94, { align: 'center' });
+  doc.text('INVITACION PERSONAL PARA', RX, 17, { align: 'center', charSpace: 0.8 });
 
-  doc.setFontSize(5);
-  doc.setTextColor(168, 255, 240);
-  // Acortar la URL si es muy larga
-  const shortUrl = url.length > 70 ? url.slice(0, 67) + '...' : url;
-  doc.text(shortUrl, W / 2, 98, { align: 'center' });
+  // Nombre del invitado
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(61, 255, 192);
+  // Ajustar tamaño según longitud del nombre
+  const nombreLen = g.nombre.length;
+  const nombreSize = nombreLen > 18 ? 8.5 : nombreLen > 14 ? 10 : 12;
+  doc.setFontSize(nombreSize);
+  // Dividir nombre largo en dos líneas si es necesario
+  const words = g.nombre.split(' ');
+  if (g.nombre.length > 16 && words.length > 1) {
+    const mid = Math.ceil(words.length / 2);
+    const line1 = words.slice(0, mid).join(' ');
+    const line2 = words.slice(mid).join(' ');
+    doc.text(line1, RX, 24, { align: 'center' });
+    doc.text(line2, RX, 31, { align: 'center' });
+  } else {
+    doc.text(g.nombre, RX, 27, { align: 'center' });
+  }
 
-  // ── Línea decorativa inferior ──
+  // Divider
   doc.setDrawColor(61, 255, 192);
   doc.setLineWidth(0.2);
   doc.setGState(doc.GState({ opacity: 0.4 }));
-  doc.line(20, H - 8, W - 20, H - 8);
+  doc.line(divX + 6, 35, W - 8, 35);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  doc.setFontSize(6);
+  // ── QR Code ──
+  const qrSize = 38; // mm
+  const qrX = RX - qrSize / 2;
+  const qrY = 38;
+
+  // Fondo blanco para el QR
+  doc.setFillColor(255, 255, 255);
+  doc.setGState(doc.GState({ opacity: 1 }));
+  doc.roundedRect(qrX - 1, qrY - 1, qrSize + 2, qrSize + 2, 1.5, 1.5, 'F');
+
+  // Borde mint del QR
+  doc.setDrawColor(61, 255, 192);
+  doc.setLineWidth(0.4);
+  doc.setGState(doc.GState({ opacity: 0.7 }));
+  doc.roundedRect(qrX - 1, qrY - 1, qrSize + 2, qrSize + 2, 1.5, 1.5, 'S');
+  doc.setGState(doc.GState({ opacity: 1 }));
+
+  try {
+    const qrDataUrl = await generateQRDataURL(url);
+    doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+  } catch(e) {
+    // Fallback si falla el QR
+    doc.setFontSize(5);
+    doc.setTextColor(100, 100, 100);
+    doc.text('QR no disponible', RX, qrY + qrSize / 2, { align: 'center' });
+  }
+
+  // "Escaneá para confirmar asistencia"
+  doc.setFontSize(5.5);
+  doc.setFont('helvetica', 'normal');
   doc.setTextColor(122, 184, 164);
-  doc.text('con amor ✦ Abril · 2026', W / 2, H - 4.5, { align: 'center', charSpace: 0.5 });
+  doc.text('Escanea para ver tu invitacion', RX, qrY + qrSize + 6, { align: 'center' });
+  doc.text('y confirmar asistencia', RX, qrY + qrSize + 10, { align: 'center' });
+
+  // Línea decorativa inferior (col der)
+  doc.setDrawColor(61, 255, 192);
+  doc.setLineWidth(0.2);
+  doc.setGState(doc.GState({ opacity: 0.5 }));
+  doc.line(divX + 4, H - 9, W - 8, H - 9);
+  doc.setGState(doc.GState({ opacity: 1 }));
+
+  // ID del invitado (discreto)
+  doc.setFontSize(5);
+  doc.setTextColor(60, 100, 85);
+  doc.text(`#${g.id}`, RX, H - 5, { align: 'center' });
 
   return doc;
 }
