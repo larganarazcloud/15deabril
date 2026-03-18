@@ -438,15 +438,12 @@ function toggleQR() {
 async function generateQRDataURL(text) {
   return new Promise((resolve, reject) => {
     const container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:200px;height:200px;';
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:300px;height:300px;';
     document.body.appendChild(container);
     try {
       new QRCode(container, {
-        text: text,
-        width: 200,
-        height: 200,
-        colorDark: '#050f0c',
-        colorLight: '#ffffff',
+        text: text, width: 300, height: 300,
+        colorDark: '#050f0c', colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.M
       });
     } catch(e) { document.body.removeChild(container); reject(e); return; }
@@ -455,233 +452,291 @@ async function generateQRDataURL(text) {
       const dataUrl = canvas ? canvas.toDataURL('image/png') : null;
       document.body.removeChild(container);
       dataUrl ? resolve(dataUrl) : reject(new Error('QR canvas not found'));
-    }, 150);
+    }, 200);
   });
 }
 
 async function buildPDF(g, url) {
   const { jsPDF } = window.jspdf;
 
-  // Tarjeta A5 horizontal: 148x105mm
-  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148, 105] });
-  const W = 148, H = 105;
+  // Canvas 9:16 tipo historia, 630x1120px
+  const CW = 630, CH = 1120;
+  const cx = CW / 2;
 
-  // ── Fondo negro verdoso ──
-  doc.setFillColor(5, 15, 12);
-  doc.rect(0, 0, W, H, 'F');
-
-  // ── Glows laterales ──
-  const glow = (cx, cy, maxR, steps) => {
-    for (let i = steps; i > 0; i--) {
-      const r = maxR * (i / steps);
-      const alpha = 0.04 * (i / steps);
-      doc.setFillColor(61, 255, 192);
-      doc.setGState(doc.GState({ opacity: alpha }));
-      doc.circle(cx, cy, r, 'F');
-    }
-    doc.setGState(doc.GState({ opacity: 1 }));
-  };
-  glow(0, 0, 55, 18);
-  glow(W, H, 45, 15);
-  glow(W * 0.35, H * 0.5, 30, 10);
-
-  // ── Divisor vertical (separa info de QR) ──
-  const divX = 96;
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.18);
-  doc.setGState(doc.GState({ opacity: 0.2 }));
-  doc.line(divX, 8, divX, H - 8);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // ══════════════════════════════
-  // COLUMNA IZQUIERDA (info evento)
-  // ══════════════════════════════
-  const LX = divX / 2; // centro columna izquierda
-
-  // Borde exterior fino
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.5);
-  doc.setGState(doc.GState({ opacity: 0.18 }));
-  doc.rect(3, 3, W - 6, H - 6);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // Línea decorativa superior
-  doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.5 }));
-  doc.line(8, 9, divX - 4, 9);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // Estrella decorativa
-  doc.setFontSize(10);
-  doc.setTextColor(61, 255, 192);
-  doc.text('✦', LX, 17, { align: 'center' });
-
-  // "te invita a celebrar sus"
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(122, 184, 164);
-  doc.text('TE INVITA A CELEBRAR SUS', LX, 23, { align: 'center', charSpace: 1.2 });
-
-  // "quince años"
-  doc.setFontSize(8.5);
-  doc.setTextColor(61, 255, 192);
-  doc.text('* QUINCE ANOS *', LX, 29, { align: 'center', charSpace: 0.8 });
-
-  // Nombre grande "ABRIL"
-  doc.setFontSize(34);
-  doc.setFont('helvetica', 'bolditalic');
-  doc.setTextColor(232, 253, 247);
-  doc.text('ABRIL', LX, 46, { align: 'center' });
-
-  // Divider central
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.3);
-  doc.setGState(doc.GState({ opacity: 0.6 }));
-  doc.line(LX - 16, 50, LX + 16, 50);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // Fecha
-  doc.setFontSize(7.5);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(168, 255, 240);
-  doc.text('VIERNES 17 DE ABRIL · 2026', LX, 57, { align: 'center', charSpace: 0.5 });
-
-  // Hora
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(122, 184, 164);
-  doc.text('21:00 HS  hasta las 5:00 AM', LX, 63, { align: 'center' });
-
-  // Lugar
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'italic');
-  doc.setTextColor(168, 255, 240);
-  doc.text('Merlo, Buenos Aires', LX, 70, { align: 'center' });
-
-  // Dress code
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(122, 184, 164);
-  doc.text('DRESS CODE: ELEGANTE SPORT', LX, 77, { align: 'center', charSpace: 0.5 });
-
-  // Sin verde (caja roja)
-  doc.setFillColor(180, 40, 40);
-  doc.setGState(doc.GState({ opacity: 0.15 }));
-  doc.roundedRect(LX - 24, 80, 48, 7, 1, 1, 'F');
-  doc.setGState(doc.GState({ opacity: 1 }));
-  doc.setDrawColor(200, 60, 60);
-  doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.4 }));
-  doc.roundedRect(LX - 24, 80, 48, 7, 1, 1, 'S');
-  doc.setGState(doc.GState({ opacity: 1 }));
-  doc.setFontSize(6);
-  doc.setTextColor(255, 140, 140);
-  doc.text('Sin color verde, por favor', LX, 84.8, { align: 'center' });
-
-  // Línea decorativa inferior (col izq)
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.5 }));
-  doc.line(8, H - 9, divX - 4, H - 9);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  doc.setFontSize(5.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 160, 140);
-  doc.text('con amor  *  Abril · 2026', LX, H - 5, { align: 'center', charSpace: 0.3 });
-
-  // ══════════════════════════════
-  // COLUMNA DERECHA (invitado + QR)
-  // ══════════════════════════════
-  const RX = divX + (W - divX) / 2; // centro columna derecha ~122mm
-  const RW = W - divX; // ~52mm
-
-  // Línea decorativa superior (col der)
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.5 }));
-  doc.line(divX + 4, 9, W - 8, 9);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // "invitación personal para"
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(122, 184, 164);
-  doc.text('INVITACION PERSONAL PARA', RX, 17, { align: 'center', charSpace: 0.8 });
-
-  // Nombre del invitado
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(61, 255, 192);
-  // Ajustar tamaño según longitud del nombre
-  const nombreLen = g.nombre.length;
-  const nombreSize = nombreLen > 18 ? 8.5 : nombreLen > 14 ? 10 : 12;
-  doc.setFontSize(nombreSize);
-  // Dividir nombre largo en dos líneas si es necesario
-  const words = g.nombre.split(' ');
-  if (g.nombre.length > 16 && words.length > 1) {
-    const mid = Math.ceil(words.length / 2);
-    const line1 = words.slice(0, mid).join(' ');
-    const line2 = words.slice(mid).join(' ');
-    doc.text(line1, RX, 24, { align: 'center' });
-    doc.text(line2, RX, 31, { align: 'center' });
-  } else {
-    doc.text(g.nombre, RX, 27, { align: 'center' });
-  }
-
-  // Divider
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.4 }));
-  doc.line(divX + 6, 35, W - 8, 35);
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // ── QR Code ──
-  const qrSize = 38; // mm
-  const qrX = RX - qrSize / 2;
-  const qrY = 38;
-
-  // Fondo blanco para el QR
-  doc.setFillColor(255, 255, 255);
-  doc.setGState(doc.GState({ opacity: 1 }));
-  doc.roundedRect(qrX - 1, qrY - 1, qrSize + 2, qrSize + 2, 1.5, 1.5, 'F');
-
-  // Borde mint del QR
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.4);
-  doc.setGState(doc.GState({ opacity: 0.7 }));
-  doc.roundedRect(qrX - 1, qrY - 1, qrSize + 2, qrSize + 2, 1.5, 1.5, 'S');
-  doc.setGState(doc.GState({ opacity: 1 }));
-
+  // ── QR primero (async) ──
+  let qrImg = null;
   try {
-    const qrDataUrl = await generateQRDataURL(url);
-    doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-  } catch(e) {
-    // Fallback si falla el QR
-    doc.setFontSize(5);
-    doc.setTextColor(100, 100, 100);
-    doc.text('QR no disponible', RX, qrY + qrSize / 2, { align: 'center' });
+    const qd = await generateQRDataURL(url);
+    qrImg = await new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = qd;
+    });
+  } catch(e) {}
+
+  const c = document.createElement('canvas');
+  c.width = CW; c.height = CH;
+  const ctx = c.getContext('2d');
+
+  // ══════════════════════════════════════
+  // FONDO — verde oscuro + glitter mint
+  // ══════════════════════════════════════
+  ctx.fillStyle = '#0a1f17';
+  ctx.fillRect(0, 0, CW, CH);
+
+  // Manchas de luz suave tipo glitter grande
+  const blobs = [
+    [cx*0.3, CH*0.18, 180, 0.09],
+    [cx*1.7, CH*0.12, 140, 0.07],
+    [cx*0.5, CH*0.72, 160, 0.06],
+    [cx*1.5, CH*0.65, 200, 0.08],
+    [cx,     CH*0.42, 120, 0.05],
+  ];
+  blobs.forEach(([bx, by, br, ba]) => {
+    const gr = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+    gr.addColorStop(0, `rgba(61,255,192,${ba})`);
+    gr.addColorStop(1, 'rgba(61,255,192,0)');
+    ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI*2);
+    ctx.fillStyle = gr; ctx.fill();
+  });
+
+  // Glitter — puntos pequeños de distintos tamaños
+  const rng = s => { const x = Math.sin(s * 9.13 + 2.7) * 10000; return x - Math.floor(x); };
+  for (let i = 0; i < 320; i++) {
+    const px = rng(i * 2.3) * CW;
+    const py = rng(i * 6.7) * CH;
+    const pr = rng(i * 1.9) * 3.2 + 0.4;
+    const pa = rng(i * 4.1) * 0.55 + 0.06;
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(61,255,192,${pa.toFixed(2)})`; ctx.fill();
+  }
+  for (let i = 0; i < 90; i++) {
+    const px = rng(i * 8.1 + 100) * CW;
+    const py = rng(i * 3.7 + 200) * CH;
+    const pr = rng(i * 2.1 + 50) * 2.2 + 0.3;
+    const pa = rng(i * 5.5 + 30) * 0.35 + 0.05;
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(220,255,245,${pa.toFixed(2)})`; ctx.fill();
+  }
+  const sparkPos = [[82,90],[CW-70,140],[54,420],[CW-52,380],[110,820],[CW-90,780],[cx-220,950],[cx+200,920]];
+  sparkPos.forEach(([sx,sy]) => {
+    const sz = 5 + rng(sx*sy)*6;
+    const sa = 0.5 + rng(sx+sy)*0.4;
+    ctx.strokeStyle = `rgba(61,255,192,${sa.toFixed(2)})`; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(sx-sz,sy); ctx.lineTo(sx+sz,sy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx,sy-sz); ctx.lineTo(sx,sy+sz); ctx.stroke();
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(sx-sz*.55,sy-sz*.55); ctx.lineTo(sx+sz*.55,sy+sz*.55); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx+sz*.55,sy-sz*.55); ctx.lineTo(sx-sz*.55,sy+sz*.55); ctx.stroke();
+  });
+
+  // ══════════════════════════════════════
+  // TEXTO SUPERIOR — más chico
+  // ══════════════════════════════════════
+  ctx.textAlign = 'center';
+
+  // "PRESIONA LA CARTA PARA" — reducido de 52 a 30px
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 30px Arial,sans-serif';
+  ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 6;
+  ctx.fillText('PRESIONA LA CARTA PARA', cx, 68);
+  ctx.shadowBlur = 0;
+
+  // "Abrir la invitación" — reducido de 58 a 36px
+  ctx.fillStyle = '#3DFFC0';
+  ctx.font = 'italic bold 36px Georgia,serif';
+  ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 4;
+  ctx.fillText('Abrir la invitación', cx, 108);
+  ctx.shadowBlur = 0;
+
+  // ── Flecha curva (ajustada a la nueva posición del texto) ──
+  ctx.strokeStyle = '#1a2e26'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx + 68, 118);
+  ctx.bezierCurveTo(cx + 120, 158, cx + 108, 220, cx + 48, 250);
+  ctx.stroke();
+  ctx.strokeStyle = '#3DFFC0'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx + 68, 118);
+  ctx.bezierCurveTo(cx + 120, 158, cx + 108, 220, cx + 48, 250);
+  ctx.stroke();
+  // Punta flecha
+  ctx.beginPath(); ctx.moveTo(cx+48,250); ctx.lineTo(cx+22,228); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+48,250); ctx.lineTo(cx+64,225); ctx.stroke();
+
+  // ══════════════════════════════════════
+  // SOBRE — crema (subido un poco, ahora empieza en 272)
+  // ══════════════════════════════════════
+  const eX=52, eY=272, eW=526, eH=336, eCX=eX+eW/2, eCY=eY+eH/2;
+
+  // Sombra del sobre
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 32; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 18;
+  ctx.fillStyle = '#d4c9a0';
+  rr(ctx, eX, eY, eW, eH, 18); ctx.fill();
+  ctx.restore();
+
+  // ── Cuerpo crema del sobre ──
+  const envGrad = ctx.createLinearGradient(eX, eY, eX+eW, eY+eH);
+  envGrad.addColorStop(0, '#f0ead2');
+  envGrad.addColorStop(0.5, '#e8dfc0');
+  envGrad.addColorStop(1, '#ddd3aa');
+  rr(ctx, eX, eY, eW, eH, 18); ctx.fillStyle = envGrad; ctx.fill();
+
+  // ── Triángulo solapa superior ──
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(eX,eY); ctx.lineTo(eX+eW,eY); ctx.lineTo(eCX,eCY-14); ctx.closePath();
+  const topFold = ctx.createLinearGradient(eX,eY,eCX,eCY);
+  topFold.addColorStop(0,'rgba(180,166,120,0.85)');
+  topFold.addColorStop(1,'rgba(210,198,155,0.4)');
+  ctx.fillStyle = topFold; ctx.fill(); ctx.restore();
+
+  // ── Triángulo solapa inferior ──
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(eX,eY+eH); ctx.lineTo(eX+eW,eY+eH); ctx.lineTo(eCX,eCY+14); ctx.closePath();
+  const botFold = ctx.createLinearGradient(eCX,eCY,eCX,eY+eH);
+  botFold.addColorStop(0,'rgba(200,188,140,0.5)');
+  botFold.addColorStop(1,'rgba(160,148,105,0.7)');
+  ctx.fillStyle = botFold; ctx.fill(); ctx.restore();
+
+  // ── Solapa izquierda ──
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(eX,eY); ctx.lineTo(eX,eY+eH); ctx.lineTo(eCX-10,eCY); ctx.closePath();
+  ctx.fillStyle='rgba(165,152,108,0.3)'; ctx.fill(); ctx.restore();
+
+  // ── Solapa derecha ──
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(eX+eW,eY); ctx.lineTo(eX+eW,eY+eH); ctx.lineTo(eCX+10,eCY); ctx.closePath();
+  ctx.fillStyle='rgba(210,198,155,0.25)'; ctx.fill(); ctx.restore();
+
+  // Líneas de doblez
+  ctx.strokeStyle='rgba(160,145,100,0.45)'; ctx.lineWidth=1.2;
+  [[eX,eY,eCX,eCY-14],[eX+eW,eY,eCX,eCY-14],[eX,eY+eH,eCX,eCY+14],[eX+eW,eY+eH,eCX,eCY+14]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+
+  // Borde del sobre
+  ctx.strokeStyle='rgba(140,126,84,0.5)'; ctx.lineWidth=1.5;
+  rr(ctx,eX,eY,eW,eH,18); ctx.stroke();
+
+  // ══════════════════════════════════════
+  // SELLO DE LACRE — forma de CORAZÓN mint con "A"
+  // Centrado sobre el cierre del sobre, tamaño de sello (no gigante)
+  // ══════════════════════════════════════
+  const sX = eCX;
+  const sY = eCY + 4;   // centrado verticalmente en el cruce de solapas
+  const hS = 46;        // half-size del corazón — tamaño lacre natural
+
+  // Función que traza el path del corazón centrado en (cx,cy)
+  // El corazón tiene el punto hacia abajo y los dos lóbulos arriba
+  function heartPath(ctx2, cx2, cy2, s) {
+    // s = radio aproximado; corazón simétrico
+    const top = cy2 - s * 0.35;
+    ctx2.beginPath();
+    ctx2.moveTo(cx2, cy2 + s * 0.9);          // punta inferior
+    ctx2.bezierCurveTo(
+      cx2 - s * 1.05, cy2 + s * 0.2,
+      cx2 - s * 1.1,  top,
+      cx2 - s * 0.5,  top
+    );
+    ctx2.bezierCurveTo(
+      cx2 - s * 0.1,  top - s * 0.35,
+      cx2,            top - s * 0.1,
+      cx2,            top + s * 0.15
+    );
+    ctx2.bezierCurveTo(
+      cx2,            top - s * 0.1,
+      cx2 + s * 0.1,  top - s * 0.35,
+      cx2 + s * 0.5,  top
+    );
+    ctx2.bezierCurveTo(
+      cx2 + s * 1.1,  top,
+      cx2 + s * 1.05, cy2 + s * 0.2,
+      cx2,            cy2 + s * 0.9
+    );
+    ctx2.closePath();
   }
 
-  // "Escaneá para confirmar asistencia"
-  doc.setFontSize(5.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(122, 184, 164);
-  doc.text('Escanea para ver tu invitacion', RX, qrY + qrSize + 6, { align: 'center' });
-  doc.text('y confirmar asistencia', RX, qrY + qrSize + 10, { align: 'center' });
+  // — Sombra —
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.65)';
+  ctx.shadowBlur   = 24;
+  ctx.shadowOffsetY = 10;
+  heartPath(ctx, sX, sY, hS);
+  ctx.fillStyle = '#097a52';
+  ctx.fill();
+  ctx.restore();
 
-  // Línea decorativa inferior (col der)
-  doc.setDrawColor(61, 255, 192);
-  doc.setLineWidth(0.2);
-  doc.setGState(doc.GState({ opacity: 0.5 }));
-  doc.line(divX + 4, H - 9, W - 8, H - 9);
-  doc.setGState(doc.GState({ opacity: 1 }));
+  // — Relleno con gradiente radial —
+  const hGrad = ctx.createRadialGradient(sX - hS*0.3, sY - hS*0.2, 2, sX, sY, hS * 1.3);
+  hGrad.addColorStop(0,    '#b0ffe4');
+  hGrad.addColorStop(0.3,  '#3DFFC0');
+  hGrad.addColorStop(0.7,  '#12c484');
+  hGrad.addColorStop(1,    '#086b47');
+  heartPath(ctx, sX, sY, hS);
+  ctx.fillStyle = hGrad;
+  ctx.fill();
 
-  // ID del invitado (discreto)
-  doc.setFontSize(5);
-  doc.setTextColor(60, 100, 85);
-  doc.text(`#${g.id}`, RX, H - 5, { align: 'center' });
+  // — Borde brillante —
+  heartPath(ctx, sX, sY, hS);
+  ctx.strokeStyle = 'rgba(200,255,235,0.9)';
+  ctx.lineWidth   = 2.5;
+  ctx.stroke();
+
+  // — Borde interior decorativo (más pequeño) —
+  heartPath(ctx, sX, sY, hS * 0.82);
+  ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+  ctx.lineWidth   = 1.2;
+  ctx.stroke();
+
+  // — Letra "A" centrada —
+  // El centro visual del corazón está un poco más arriba que sY
+  const textCY = sY + hS * 0.22;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle    = 'rgba(3,16,11,0.88)';
+  ctx.font         = `bold ${Math.round(hS * 1.1)}px Georgia,serif`;
+  ctx.shadowColor  = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur   = 4;
+  ctx.fillText('A', sX, textCY);
+  ctx.shadowBlur   = 0;
+  ctx.textBaseline = 'alphabetic';
+
+  // ── Footer ──
+  ctx.strokeStyle = 'rgba(61,255,192,0.38)'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(60, CH-50); ctx.lineTo(CW-60, CH-50); ctx.stroke();
+  ctx.fillStyle = 'rgba(61,255,192,0.58)';
+  ctx.font      = '300 20px Arial,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✦  Los 15 de Abril  ·  17 de Abril 2026  ✦', cx, CH-24);
+
+  // ── PDF: imagen + link invisible clickeable sobre el corazón ──
+  // El canvas es 630×1120px → PDF es 105×187mm
+  // Escala: px→mm  x: 105/630 = 1/6    y: 187/1120 ≈ 0.16696
+  const scaleX = 105 / CW;
+  const scaleY = 187 / CH;
+
+  const imgData = c.toDataURL('image/jpeg', 0.96);
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:[105, 187] });
+  doc.addImage(imgData, 'JPEG', 0, 0, 105, 187);
+
+  // Bounding box del corazón en mm (rect que lo contiene)
+  const heartLeft   = (sX - hS * 1.12) * scaleX;
+  const heartTop    = (sY - hS * 1.3)  * scaleY;
+  const heartWidth  = hS * 2.24         * scaleX;
+  const heartHeight = hS * 2.2          * scaleY;
+
+  // Agrega anotación de link invisible sobre el corazón
+  doc.link(heartLeft, heartTop, heartWidth, heartHeight, { url });
 
   return doc;
+}
+
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
 }
 
 async function quickPDF(id) {
@@ -702,7 +757,6 @@ async function generatePDFFromPopup() {
   doc.save(`invitacion-${popupGuest.nombre.replace(/\s+/g,'-').toLowerCase()}.pdf`);
   showToast(`✨ PDF generado`);
 
-  // Abrir WhatsApp con el link para compartir
   const waMsg = encodeURIComponent(
     `👑 ¡Hola ${popupGuest.nombre}! Te mando tu invitación personalizada para los 15 de Abril 💚\n\n${popupUrl}\n\n¡Te espero! ✨`
   );
