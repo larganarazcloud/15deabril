@@ -381,50 +381,54 @@ async function generateToken(id,nombre){
 }
 
 const INVITADOS_JSON=[
-  {id:'01',nombre:'Abuela Elsa'},
-  {id:'02',nombre:'Abuelo Dani'},
-  {id:'03',nombre:'Nazarena'},
-  {id:'04',nombre:'Matias'},
-  {id:'05',nombre:'Tia Ivana'},
-  {id:'06',nombre:'Tio Alejandro'},
-  {id:'07',nombre:'Leandro'},
-  {id:'08',nombre:'Rata'},
-  {id:'09',nombre:'Tia Melody y Flia'},
-  {id:'10',nombre:'Lucas y Flia'},
-  {id:'11',nombre:'Abuela Celestina'},
-  {id:'12',nombre:'Abuelo Jose'},
-  {id:'13',nombre:'Ita'},
-  {id:'14',nombre:'Zoe'},
-  {id:'15',nombre:'Tia Rosa y Flia'},
-  {id:'16',nombre:'Tia Pacho y Flia'},
-  {id:'17',nombre:'Tia Evelia'},
-  {id:'18',nombre:'Tomas y Flia'},
-  {id:'19',nombre:'Florencia y Flia'},
-  {id:'20',nombre:'Gabriela y Flia'},
-  {id:'21',nombre:'Tio Sebastián y Flia'},
-  {id:'22',nombre:'Nicolas'},
-  {id:'23',nombre:'Simona'},
-  {id:'24',nombre:'Fiorella'},
-  {id:'25',nombre:'Estigarribia'},
-  {id:'26',nombre:'Milagros Arias'},
-  {id:'27',nombre:'Martina Ruiz'},
-  {id:'28',nombre:'Malena'},
-  {id:'29',nombre:'Valentina'},
-  {id:'30',nombre:'Kiara'},
-  {id:'31',nombre:'Barbara'},
-  {id:'32',nombre:'Cinthia y Flia'},
-  {id:'33',nombre:'Martina Obregón'},
-  {id:'34',nombre:'Brian Aldana'},
-  {id:'35',nombre:'Marcos'},
-  {id:'36',nombre:'Santiago'},
-  {id:'37',nombre:'Priscilla'},
-  {id:'38',nombre:'Avril y Flia'},
-  {id:'39',nombre:'Fiorella Melody'},
-  {id:'40',nombre:'Milagros'},
-  {id:'41',nombre:'Laura Bordon y Flia'},
-  {id:'42',nombre:'Alejandra Liendro y Flia'},
-  {id:'43',nombre:'Ramiro Landete'},
-  {id:'44',nombre:'Ramiro Perez'},
+  {id:'01',nombre:"Abuela Elsa"},
+  {id:'02',nombre:"Abuelo Dani"},
+  {id:'03',nombre:"Nazarena"},
+  {id:'04',nombre:"Matias"},
+  {id:'05',nombre:"Tia Ivana"},
+  {id:'06',nombre:"Tio Alejandro"},
+  {id:'07',nombre:"Leandro"},
+  {id:'09',nombre:"Tia Melody y Flia"},
+  {id:'10',nombre:"Lucas y Flia"},
+  {id:'11',nombre:"Abuela Celestina"},
+  {id:'12',nombre:"Abuelo Jose"},
+  {id:'13',nombre:"Ita"},
+  {id:'14',nombre:"Zoe"},
+  {id:'15',nombre:"Tia Rosa y Flia"},
+  {id:'16',nombre:"Tia Pacho y Flia"},
+  {id:'17',nombre:"Tia Evelia"},
+  {id:'18',nombre:"Tomas y Flia"},
+  {id:'19',nombre:"Florencia y Flia"},
+  {id:'20',nombre:"Gabriela y Flia"},
+  {id:'21',nombre:"Tio Sebastián y Flia"},
+  {id:'22',nombre:"Nicolas"},
+  {id:'23',nombre:"Simona"},
+  {id:'24',nombre:"Fiorella"},
+  {id:'25',nombre:"Estigarribia"},
+  {id:'26',nombre:"Milagros Arias"},
+  {id:'27',nombre:"Martina Ruiz"},
+  {id:'28',nombre:"Malena"},
+  {id:'29',nombre:"Valentina"},
+  {id:'30',nombre:"Kiara"},
+  {id:'31',nombre:"Barbara"},
+  {id:'32',nombre:"Cinthia y Flia"},
+  {id:'33',nombre:"Martina Obregón"},
+  {id:'34',nombre:"Brian Aldana"},
+  {id:'35',nombre:"Marcos"},
+  {id:'36',nombre:"Santiago"},
+  {id:'37',nombre:"Priscilla"},
+  {id:'38',nombre:"Avril y Flia"},
+  {id:'39',nombre:"Fiorella Melody"},
+  {id:'40',nombre:"Milagros"},
+  {id:'41',nombre:"Laura Bordon y Flia"},
+  {id:'42',nombre:"Alejandra Liendro y Flia"},
+  {id:'43',nombre:"Ramiro Landete"},
+  {id:'44',nombre:"Ramiro Perez"},
+  {id:'45',nombre:"TEST"},
+  {id:'46',nombre:"Brian"},
+  {id:'47',nombre:"Aldana"},
+  {id:'48',nombre:"Noemi"},
+  {id:'49',nombre:"Melody"}
 ];
 
 let guestName='',guestId='';
@@ -433,8 +437,6 @@ async function verifyToken(){
   const params=new URLSearchParams(window.location.hash.slice(1));
   const token=params.get('token'),id=params.get('id');
   if(!token&&!id)return;
-  // Si el admin guardó invitados en localStorage, usarlos (así los nuevos también son válidos)
-  try{const ls=localStorage.getItem('abril15_v6_guests');if(ls){const p=JSON.parse(ls);if(Array.isArray(p)&&p.length)INVITADOS_JSON.splice(0,INVITADOS_JSON.length,...p);}}catch(e){}
   const inv=INVITADOS_JSON.find(g=>g.id===id);
   if(!inv){showInvalid();return;}
   const exp=await generateToken(inv.id,inv.nombre);
@@ -561,4 +563,4 @@ function launchPartyFireworks(){clearInterval(rocketInterval);let b=0;const iv=s
 verifyToken();updateCountdown();updatePhotos();setInterval(updateCountdown,1000);setInterval(updatePhotos,30000);
 </script>
 </body>
-</html>
+</html
