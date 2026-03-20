@@ -433,6 +433,8 @@ async function verifyToken(){
   const params=new URLSearchParams(window.location.hash.slice(1));
   const token=params.get('token'),id=params.get('id');
   if(!token&&!id)return;
+  // Si el admin guardó invitados en localStorage, usarlos (así los nuevos también son válidos)
+  try{const ls=localStorage.getItem('abril15_v6_guests');if(ls){const p=JSON.parse(ls);if(Array.isArray(p)&&p.length)INVITADOS_JSON.splice(0,INVITADOS_JSON.length,...p);}}catch(e){}
   const inv=INVITADOS_JSON.find(g=>g.id===id);
   if(!inv){showInvalid();return;}
   const exp=await generateToken(inv.id,inv.nombre);
